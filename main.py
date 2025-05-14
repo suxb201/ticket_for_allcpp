@@ -106,8 +106,12 @@ def getpurser(cookie_str):
         headers=headers,
     )
     purrer = pur.content.decode("utf-8")
-    purrer_data = json.loads(purrer)
-    return purrer_data
+    if "由于访问人数" in purrer:
+        return False
+    else:
+        print(purrer)
+        purrer_data = json.loads(purrer)
+        return purrer_data
 
 
 def check_success(cookies,ticketid):
@@ -293,9 +297,16 @@ def main():
     i=0
     while i<len(cookies):
         ifn = getpurser(cookies[i])
+        if ifn == False:
+            print(f"由于访问人数过多，请稍后再试")
+            return
+        if "message" in ifn and "统繁忙" in ifn["message"]:
+            print(f"统繁忙")
+            return
         print(ifn)
         print(ticket_ids[i])
         i+=1
+    
     if input('正确(回复T) or 错误(回复F) \n') == 'T':
         print("1.定时 2.捡漏\n")
         if input()== '1':
@@ -304,8 +315,9 @@ def main():
         else:
             start(cookies, ticket_ids)
     else: 
-        exit
+        pass
 
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
